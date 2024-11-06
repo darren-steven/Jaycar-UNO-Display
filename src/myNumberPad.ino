@@ -24,9 +24,9 @@
 
 // calibration mins and max for raw data when touching edges of screen
 // YOU CAN USE THIS SKETCH TO DETERMINE THE RAW X AND Y OF THE EDGES TO GET YOUR HIGHS AND LOWS FOR X AND Y
-#define TS_MINX 210
-#define TS_MINY 210
-#define TS_MAXX 915
+#define TS_MINX 150
+#define TS_MINY 70
+#define TS_MAXX 910
 #define TS_MAXY 910
 
 //SPI Communication
@@ -220,9 +220,9 @@ void loop() {
     }
 
     // good for debuggin, prints out the x,y cordinates of the press
-    // tft.setTextSize(3);
-    // tft.print("X = "); tft.println(X);
-    // tft.print("Y = "); tft.println(Y);
+    tft.setTextSize(3);
+    tft.print("X = "); tft.println(X);
+    tft.print("Y = "); tft.println(Y);
 
   }
 }
@@ -237,16 +237,20 @@ void retrieveTouch()
   pinMode(XM, OUTPUT);
   pinMode(YP, OUTPUT);
 
-
-
+  // print data if pressure not zero
+  if (p.z > 0) {
+    Serial.print("X = "); Serial.print(p.x);
+    Serial.print("\tY = "); Serial.print(p.y);
+    Serial.print("\tPressure = "); Serial.println(p.z);
+  }
 
   //Scale from 0->1023 to tft.width
-    //X = map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
-  //  Y = map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
+    X = map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
+   Y = tft.height() -map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
 
   // on my tft the numbers are reversed so this is used instead of the above
-  X = tft.width() - map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
-  Y = map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
+  // X = tft.width() - map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
+  // Y = map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
   Z = p.z;
 
 
