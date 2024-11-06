@@ -13,6 +13,7 @@
    Enjoy!
 */
 
+#include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <TouchScreen.h>
 #include <Adafruit_TFTLCD.h>
@@ -93,6 +94,139 @@ double leftColPositionX = center - fromCenter;
 double midColPositionX = center;
 //Right column starting x posision
 double rightColPositionX = center + fromCenter;
+
+void retrieveTouch()
+{
+  digitalWrite(13, HIGH);
+  TSPoint p = ts.getPoint();
+  digitalWrite(13, LOW);
+
+  //If sharing pins, you'll need to fix the directions of the touchscreen pins
+  pinMode(XM, OUTPUT);
+  pinMode(YP, OUTPUT);
+
+  // print data if pressure not zero
+  if (p.z > 0) {
+    Serial.print("X = "); Serial.print(p.x);
+    Serial.print("\tY = "); Serial.print(p.y);
+    Serial.print("\tPressure = "); Serial.println(p.z);
+  }
+
+  //Scale from 0->1023 to tft.width
+    X = map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
+   Y = tft.height() -map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
+
+  // on my tft the numbers are reversed so this is used instead of the above
+  // X = tft.width() - map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
+  // Y = map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
+  Z = p.z;
+
+}
+
+void createButtons() {
+  //(initial x,initial y,width,height,color)
+  double secondRowVertialAlign = secondRow + verticalAlign;
+  double thirdRowVertialAlign = thirdRow + verticalAlign;
+  double fourthRowVertialAlign = fourthRow + verticalAlign;
+
+  /***Draw filled squares with specified dimensions and position***/
+  //First Row
+  tft.fillRect(leftColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
+  tft.fillRect(midColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
+  tft.fillRect(rightColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
+
+  //Second Row
+  tft.fillRect(leftColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+  tft.fillRect(midColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+  tft.fillRect(rightColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+
+  //Third Row
+  tft.fillRect(leftColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+  tft.fillRect(midColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+  tft.fillRect(rightColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+
+  //Fourth Row
+  tft.fillRect(leftColPositionX, fourthRowVertialAlign, (BOXSIZE * 2) + padding, BOXSIZE, GREY);
+  tft.fillRect(rightColPositionX, fourthRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
+
+  /***Draw Borders around squares***/
+  //First Row
+  tft.drawRect(leftColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
+  tft.drawRect(midColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
+  tft.drawRect(rightColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
+
+  //Second Row
+  tft.drawRect(leftColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+  tft.drawRect(midColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+  tft.drawRect(rightColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+
+  //Third Row
+  tft.drawRect(leftColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+  tft.drawRect(midColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+  tft.drawRect(rightColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+
+  //Fourth Row
+  tft.drawRect(leftColPositionX, fourthRowVertialAlign, (BOXSIZE * 2) + padding, BOXSIZE, BLACK);
+  tft.drawRect(rightColPositionX, fourthRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
+}
+
+void insertNumbers() {
+  //Centers text horizontally on all three columns
+  double leftColCursorX   = leftColPositionX + (BOXSIZE / 3);
+  double midColCursorX    = midColPositionX  + (BOXSIZE / 3);
+  double rightColCursorX  = rightColPositionX + (BOXSIZE / 3);
+  //Centers text horizontally on all four rows
+  double firstRowCursorY  = verticalAlign + (BOXSIZE / 3);
+  double secondRowCursorY = secondRow + firstRowCursorY;
+  double thirdRowCursorY  = thirdRow  + firstRowCursorY;
+  double fourthRowCursorY = fourthRow + firstRowCursorY;
+
+  tft.setTextSize(4);
+  tft.setTextColor(BLACK);
+
+  //Insert Number 1
+  tft.setCursor(leftColCursorX, firstRowCursorY);
+  tft.println("1");
+
+  tft.setCursor(midColCursorX, firstRowCursorY);
+  tft.println("2");
+
+  //Insert Number 3
+  tft.setCursor(rightColCursorX, firstRowCursorY);
+  tft.println("3");
+
+  //Insert Number 4
+  tft.setCursor(leftColCursorX, secondRowCursorY);
+  tft.println("4");
+
+  //Insert Number 5
+  tft.setCursor(midColCursorX, secondRowCursorY);
+  tft.println("5");
+
+  //Insert Number 6
+  tft.setCursor(rightColCursorX, secondRowCursorY);
+  tft.println("6");
+
+  //Insert Number 7
+  tft.setCursor(leftColCursorX, thirdRowCursorY);
+  tft.println("7");
+
+  //Insert Number 8
+  tft.setCursor(midColCursorX, thirdRowCursorY);
+  tft.println("8");
+
+  //Insert Number 9
+  tft.setCursor(rightColCursorX, thirdRowCursorY);
+  tft.println("9");
+
+  //Insert Number 0
+  tft.setCursor(leftColPositionX + BOXSIZE, fourthRowCursorY);
+  tft.println("0");
+
+  //Insert Period Character
+  tft.setCursor(rightColCursorX, fourthRowCursorY);
+  tft.println(".");
+}
 
 void setup() {
   Serial.begin(9600);
@@ -225,140 +359,5 @@ void loop() {
     tft.print("Y = "); tft.println(Y);
 
   }
-}
-
-void retrieveTouch()
-{
-  digitalWrite(13, HIGH);
-  TSPoint p = ts.getPoint();
-  digitalWrite(13, LOW);
-
-  //If sharing pins, you'll need to fix the directions of the touchscreen pins
-  pinMode(XM, OUTPUT);
-  pinMode(YP, OUTPUT);
-
-  // print data if pressure not zero
-  if (p.z > 0) {
-    Serial.print("X = "); Serial.print(p.x);
-    Serial.print("\tY = "); Serial.print(p.y);
-    Serial.print("\tPressure = "); Serial.println(p.z);
-  }
-
-  //Scale from 0->1023 to tft.width
-    X = map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
-   Y = tft.height() -map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
-
-  // on my tft the numbers are reversed so this is used instead of the above
-  // X = tft.width() - map(p.x, TS_MAXX, TS_MINX, 0, tft.width());
-  // Y = map(p.y, TS_MAXY, TS_MINY, 0, tft.height());
-  Z = p.z;
-
-
-
-}
-
-void createButtons() {
-  //(initial x,initial y,width,height,color)
-  double secondRowVertialAlign = secondRow + verticalAlign;
-  double thirdRowVertialAlign = thirdRow + verticalAlign;
-  double fourthRowVertialAlign = fourthRow + verticalAlign;
-
-  /***Draw filled squares with specified dimensions and position***/
-  //First Row
-  tft.fillRect(leftColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
-  tft.fillRect(midColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
-  tft.fillRect(rightColPositionX, verticalAlign, BOXSIZE, BOXSIZE, GREY);
-
-  //Second Row
-  tft.fillRect(leftColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-  tft.fillRect(midColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-  tft.fillRect(rightColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-
-  //Third Row
-  tft.fillRect(leftColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-  tft.fillRect(midColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-  tft.fillRect(rightColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-
-  //Fourth Row
-  tft.fillRect(leftColPositionX, fourthRowVertialAlign, (BOXSIZE * 2) + padding, BOXSIZE, GREY);
-  tft.fillRect(rightColPositionX, fourthRowVertialAlign, BOXSIZE, BOXSIZE, GREY);
-
-  /***Draw Borders around squares***/
-  //First Row
-  tft.drawRect(leftColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
-  tft.drawRect(midColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
-  tft.drawRect(rightColPositionX, verticalAlign, BOXSIZE, BOXSIZE, BLACK);
-
-  //Second Row
-  tft.drawRect(leftColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-  tft.drawRect(midColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-  tft.drawRect(rightColPositionX, secondRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-
-  //Third Row
-  tft.drawRect(leftColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-  tft.drawRect(midColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-  tft.drawRect(rightColPositionX, thirdRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-
-  //Fourth Row
-  tft.drawRect(leftColPositionX, fourthRowVertialAlign, (BOXSIZE * 2) + padding, BOXSIZE, BLACK);
-  tft.drawRect(rightColPositionX, fourthRowVertialAlign, BOXSIZE, BOXSIZE, BLACK);
-}
-
-void insertNumbers() {
-  //Centers text horizontally on all three columns
-  double leftColCursorX   = leftColPositionX + (BOXSIZE / 3);
-  double midColCursorX    = midColPositionX  + (BOXSIZE / 3);
-  double rightColCursorX  = rightColPositionX + (BOXSIZE / 3);
-  //Centers text horizontally on all four rows
-  double firstRowCursorY  = verticalAlign + (BOXSIZE / 3);
-  double secondRowCursorY = secondRow + firstRowCursorY;
-  double thirdRowCursorY  = thirdRow  + firstRowCursorY;
-  double fourthRowCursorY = fourthRow + firstRowCursorY;
-
-  tft.setTextSize(4);
-  tft.setTextColor(BLACK);
-
-  //Insert Number 1
-  tft.setCursor(leftColCursorX, firstRowCursorY);
-  tft.println("1");
-
-  tft.setCursor(midColCursorX, firstRowCursorY);
-  tft.println("2");
-
-  //Insert Number 3
-  tft.setCursor(rightColCursorX, firstRowCursorY);
-  tft.println("3");
-
-  //Insert Number 4
-  tft.setCursor(leftColCursorX, secondRowCursorY);
-  tft.println("4");
-
-  //Insert Number 5
-  tft.setCursor(midColCursorX, secondRowCursorY);
-  tft.println("5");
-
-  //Insert Number 6
-  tft.setCursor(rightColCursorX, secondRowCursorY);
-  tft.println("6");
-
-  //Insert Number 7
-  tft.setCursor(leftColCursorX, thirdRowCursorY);
-  tft.println("7");
-
-  //Insert Number 8
-  tft.setCursor(midColCursorX, thirdRowCursorY);
-  tft.println("8");
-
-  //Insert Number 9
-  tft.setCursor(rightColCursorX, thirdRowCursorY);
-  tft.println("9");
-
-  //Insert Number 0
-  tft.setCursor(leftColPositionX + BOXSIZE, fourthRowCursorY);
-  tft.println("0");
-
-  //Insert Period Character
-  tft.setCursor(rightColCursorX, fourthRowCursorY);
-  tft.println(".");
 }
 
